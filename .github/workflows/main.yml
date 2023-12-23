@@ -1,0 +1,142 @@
+# THE FOLLOWING ACTIONS CODE IS FROM THE PSYCH ENGINE REPO: https://github.com/ShadowMario/FNF-PsychEngine/blob/main/.github/workflows/main.yml
+
+name: build
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2.3.0
+
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.2.5
+      # Runs a set of commands using the runners shell
+      - name: Install Haxelib
+        run: |
+          haxelib setup C:/haxelib
+          haxelib install hxcpp > nul
+          haxelib install lime 8.0.0
+          haxelib install openfl
+          haxelib install flixel 4.11.0
+          haxelib run lime setup flixel
+          haxelib run lime setup         
+          haxelib remove flixel-addons
+          haxelib remove flixel-tools
+          haxelib remove flixel-ui
+          haxelib install flixel-tools
+          haxelib install flixel-ui
+          haxelib install flixel-addons 2.9.0
+          haxelib install tjson
+          haxelib install hxjsonast
+          haxelib install hxCodec 2.5.1          
+          haxelib install linc_luajit
+          haxelib install hscript
+          haxelib git hscript-ex https://github.com/ianharrigan/hscript-ex
+          haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc
+          haxelib git hxvm-luajit https://github.com/nebulazorua/hxvm-luajit
+          haxelib git faxe https://github.com/uhrobots/faxe
+          haxelib git polymod https://github.com/larsiusprime/polymod.git
+          haxelib install hxcpp-debug-server
+          haxelib list
+        shell: cmd
+      - name: Compile
+        run: haxelib run lime build windows -release
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: WindowsBuild
+          path: export/release/windows/bin
+  android:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.2.3
+          
+      - name: Cache haxelib path
+        uses: actions/cache@v2
+        with:
+          path: |
+            %HAXELIB_ROOT%
+          key: ${{ runner.os }}-android
+
+      - name: Install Clang
+        uses: egor-tensin/setup-clang@v1
+          
+      - name: Setup Android SDK Tools
+        uses: android-actions/setup-android@v2.0.2
+        
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.3.1
+        with:
+          distribution: 'zulu' # See 'Supported distributions' for available options
+          java-version: '11'
+        
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r13b
+
+      # Runs a set of commands using the runners shell
+      - name: script run line haha
+        run: |
+          mkdir -p "%HAXELIB_ROOT%"
+          haxelib setup "%HAXELIB_ROOT%"
+          haxelib install lime 8.0.0
+          haxelib install openfl
+          haxelib install flixel 4.11.0
+          haxelib run lime setup flixel
+          haxelib run lime setup         
+          haxelib remove flixel-addons
+          haxelib remove flixel-tools
+          haxelib remove flixel-ui
+          haxelib install flixel-tools
+          haxelib install flixel-ui
+          haxelib install flixel-addons 2.9.0
+          haxelib install tjson
+          haxelib install hxjsonast
+          haxelib install hxCodec 2.5.1          
+          haxelib install linc_luajit
+          haxelib install hscript
+          haxelib install actuate 
+          haxelib git hscript-ex https://github.com/ianharrigan/hscript-ex
+          haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc
+          haxelib git hxvm-luajit https://github.com/nebulazorua/hxvm-luajit
+          haxelib git faxe https://github.com/uhrobots/faxe
+          haxelib git polymod https://github.com/larsiusprime/polymod.git
+          haxelib install hxcpp-debug-server
+          haxelib remove hxcpp
+          haxelib git hxcpp https://github.com/matthewfro1717/hxcpp.git
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_ROOT
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SETUP true
+          haxelib list
+          
+      - name: funni build logs
+        run: haxelib run lime build android -release
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: AndroidBuild
+          path: export/release/android/bin/app/build/outputs/apk/debug
