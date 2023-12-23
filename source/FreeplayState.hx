@@ -95,7 +95,9 @@ class FreeplayState extends MusicBeatState
 		'electric-cockaldoodledoo',
 		'super-saiyan',
 		'foolhardy',
-		'doge-vs-bambi'
+		'doge-vs-bambi',
+		'corn-filled-choas',
+		'phone-smash-bash'
 	];
 
 	public static var noExtraKeys:Array<String> = 
@@ -135,7 +137,9 @@ class FreeplayState extends MusicBeatState
 		'bonkers',
 		'duper',
         'omission',
-		'doge-vs-bambi'
+		'doge-vs-bambi',
+		'corn-filled-choas',
+		'phone-smash-bash'
 	];
 
 	private var camFollow:FlxObject;
